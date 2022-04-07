@@ -13,3 +13,171 @@ SQL -> 정형 데이터로 만들어진 관계형 데이터베이슬 조작하�
 열과 행 2차원으로 이루어진 테이블을 중심으로 설계되고 키와 관계라는 연결고리로
 그 테이블들을 사용하여 원하는 방식으로 데이터를 조회하고 가공하는 방식의 데이터베이스
 
+
+* 특정열들만 조회
+select employee_id, first_name, last_name
+from HR.employees;
+
+
+* 특정열을 기준으로 내림차순 정렬하여 출력하기 
+SELECT employee_id, first_name, last_name
+FROM   employees
+ORDER BY employee_id DESC;
+
+
+* 고유한 하나씩만 출력
+SELECT DISTINCT job_id
+FROM hr.employees;
+
+* 별칭 설정 AS 설정 가능
+SELECT employee_id AS 사원번호, first_name AS 이름, last_name AS 성
+FROM hr.employees;
+
+* 연결연산자
+SELECT employee_id, first_name || '  ' || last_name,
+       email || '@' || 'company.com'
+FROM hr.employees;
+
+
+* 기존 열값을 이용한 계산
+SELECT employee_id, salary, salary+500, salary-100, (salary*1.1)/2
+FROM hr.employees;
+
+SELECT employee_id AS 사원번호,
+        salary AS 급여,
+        salary+500 AS 추가급여,
+        salary-100 AS 인하급여,
+        (salary*1.1)/2 AS 조정급여
+FROM hr.employees;
+
+
+where 절     
+SELECT *
+FROM hr.employees
+WHERE employee_id >= 100;
+
+SELECT *
+FROM   employees
+WHERE  first_name = 'David';
+        
+
+SELECT *
+FROM hr.employees
+WHERE salary BETWEEN 10000 AND 20000;
+
+
+IN 연산자 특정항목들이 포함된 행들만 추출
+
+SELECT *
+FROM   employees
+WHERE  salary IN (10000, 17000, 24000);
+
+
+LIKE 연산자는 조회 조건 값이 명확하지 않을때 사용
+% 몇글자가 오던 글자가 없건 상관하지 않음
+
+SELECT *
+FROM hr.employees
+WHERE job_id LIKE 'AD%';
+
+_는 한 글자를 의미
+SELECT *
+FROM hr.employees
+WHERE job_id LIKE 'AD___';
+
+
+IS NULL 값이 빈 셀을 검색
+
+SELECT *
+FROM hr.employees
+WHERE manager_id IS NULL;
+
+
+두개의 조건을 동시에 만족
+
+SELECT *
+FROM hr.employees
+WHERE salary > 4000 
+AND job_id = 'IT_PROG';
+
+
+SELECT *
+FROM hr.employees
+WHERE salary > 4000 
+AND job_id = 'IT_PROG'
+OR job_id = 'FI_ACCOUNT';
+
+
+<> 아닌 겂들만 출력
+
+SELECT *
+FROM hr.employees
+WHERE employee_id <> 105;
+
+
+LOWER
+값을 소문자로 
+
+UPPER
+값을 대문자로 
+
+INITCAP
+첫 번째 글자만 대문자로 
+
+SELECT last_name,
+       LOWER(last_name) LOWER적용,
+       UPPER(last_name) UPPER적용,
+       email,
+       INITCAP(email) INITCAP적용
+FROM   hr.employees;        
+
+필요한 글자만 잘라내기( 대상열, 시작위치, 길이)
+SELECT job_id, SUBSTR(job_id, 1,2)
+FROM hr.employees;
+
+
+특정 문자열을 찾아 바꾸는 함수
+SELECT job_id, REPLACE(job_id, 'ACCOUNT', 'ACCNT') 
+FROM   hr.employees;
+
+
+LPAD 왼쪽을 채우는데 자리수를 만들어 빈공간을 채움
+(대상열, 자리수, 빈공간을 채울 문자)
+SELECT first_name, LPAD(first_name, 12, '*') 
+FROM  hr.employees;
+
+
+LTRIM 왼쪽부터 지정한 문자를 지우는 함수
+RTRIM 오른쪽부터 지정한 문자를 지우는 함수
+
+SELECT job_id,
+
+       LTRIM(job_id, 'F') LTRIM,
+       RTRIM(job_id, 'T') RTRIM
+
+FROM    hr.employees;
+
+
+ROUND 반올림(대상열, 반올림자리)
+1 소수점 아래 한자리로
+-1 소수점위 한자리부터
+
+SELECT salary,
+    salary/30 일급,
+    ROUND(salary/30, 0) 적용결과0,
+    ROUND(salary/30, 1) 적용결과1,
+    ROUND(salary/30, -1) 적용결과MINUS1
+FROM hr.employees;
+
+
+TRUNC 버림
+1 소수점아래 한자리로
+-1 소수점위 한자리부터 
+
+
+SELECT salary,
+       salary/30 일급,
+       TRUNC(salary/30, 0) 적용결과0,
+       TRUNC(salary/30, 1) 적용결과1,
+       TRUNC(salary/30, -1) 적용결과MINUS1
+FROM   hr.employees;
