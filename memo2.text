@@ -1,0 +1,542 @@
+데이터 베이스 database
+
+structured data
+정형데이터 - 틀이 잡혀있는 체계화된 데이터
+	   excel, csv ....
+
+unstructured data
+비정형데이터-특이 없이 사전 정의가 없는 데이터, 다양하고 방대한 양의 데이터
+           텍스트, 이미지, 음원, 음성.
+
+오라클 데이터 베이스는 정형데이터를 다루는 관계형 데이터베이스이다. 많은 기업들에서는 관계형 데이터 베이스를 많이 사용한다. 
+SQL 은 정형 데이터로 만들어진 관계형 데이터베이스를 조작하는 언어이다. 
+
+관계형 데이터베이스란 열과 행 2차원으로 이루어진 테이블을 중심으로 설계되고 키와 관계라는 연결고리로 그 테이블들을 사용하여 원하는 방식으로 데이터를 조회하고 가공하는 방식의 데이터베이스이다. 
+기타 계층형 DB 개체지향DB XML DB
+
+
+
+SQL 은 관계형 데이터베이스들에서 사용이 되는 표준 언어 1970년대에 SEQUEL이라는 언어를 기반으로 만들어졌다.  1980년대에 ANSI ISO 표준을 따르고 있다. 
+
+SQL특징
+1 사용하기쉽다
+2 비절차적 언어이다
+3 데이터를 정의 검색 조작 한다.
+4 표준언어이다. 
+
+
+
+
+
+ 
+# 테이블 전체 내용 보기
+SELECT *
+FROM hr.employees;
+
+
+
+# 특정 열만 출력하기
+SELECT employee_id, first_name, last_name
+FROM hr.employees;
+
+
+
+# 특정열을 기준으로 내림차순 정렬하여 출력하기
+SELECT employee_id, first_name, last_name
+FROM hr.employees
+ORDER BY employee_id DESC;
+
+
+
+# 고유한 하나씩만 출력
+SELECT DISTINCT job_id
+FROM hr.employees;
+
+
+
+# 별칭 설정 AS 생략가능
+SELECT employee_id AS 사원번호, first_name AS 이름, last_name AS 성
+FROM hr.employees;
+
+
+
+# 열값들을 붙여서 하나의 셀에 출력
+SELECT employee_id, first_name || ' ' || last_name
+FROM hr.employees;
+
+
+SELECT employee_id, first_name || ' ' || last_name,
+        email || '@' || 'company.com'
+FROM hr.employees;
+
+
+
+# 기본 열값을 이용한 계산
+SELECT employee_id, salary, salary+500, salary-100, (salary*1.1)/2
+FROM hr.employees;
+
+
+SELECT employee_id AS 사원번호, 
+        salary AS 급여, 
+        salary+500 AS 추가급여, 
+        salary-100 AS 인하급여, 
+        (salary*1.1)/2 AS 조정급여
+FROM hr.employees;
+
+
+
+# WHERE 절 행에서 원하는 값을 추출할 때 사용
+SELECT *
+FROM hr.employees
+WHERE employee_id=100;
+
+   글자로 찾을 때는 작은 따옴표 사용(대소문자 가림)
+SELECT *
+FROM hr.employees
+WHERE first_name = 'David';
+
+   부등호연산자
+SELECT *
+FROM hr.employees
+WHERE employee_id >= 105;
+
+
+
+
+# BETWEEN a AND b 숫자 a부터 b까지
+SELECT *
+FROM hr.employees
+WHERE salary BETWEEN 10000 AND 20000;
+
+
+
+# IN 연산자 특정 항목들이 포함된 행들만 추출
+SELECT *
+FROM hr.employees
+WHERE salary IN (10000,17000,24000);
+
+
+
+# LIKE 연산자
+LIKE 연산자는 조회 조건 값이 명확하지 않을때 사용
+
+   % 몇글자가 오던 글자가 없건 상관하지 않는다.
+SELECT *
+FROM hr.employees
+WHERE job_id LIKE 'AD%'
+   
+   _ 글자 1개를 의미
+SELECT *
+FROM hr.employees
+WHERE job_id LIKE 'AD___'
+
+   IS NULL 값이 빈 셀을 검색
+SELECT *
+FROM hr.employees
+WHERE manager_id IS NULL;
+
+   두개 조건을 동시 만족하는 값을 출력
+SELECT *
+FROM hr.employees
+WHERE salary > 4000
+AND job_id = 'IT_PROG';
+
+   샐러리는 4000이 반드시 넘고  IT_PROG와 FI_ACCOUNT 모두
+SELECT *
+FROM hr.employees
+WHERE salary > 4000
+AND job_id = 'IT_PROG'
+OR  job_id = 'FI_ACCOUNT';
+
+   <> 아닌 값들만 출력
+SELECT *
+FROM hr.employees
+WHERE employee_id <> 105;
+
+   not 결과값을 뒤집어 출력
+SELECT *
+FROM hr.employees
+WHERE manager_id IS NOT NULL;
+
+
+
+
+
+
+
+
+
+
+
+# 함수.............................................................................................
+단일 행 함수는 한 번에 하나의 데이터를 처리하는 함수입니다. a1 값을 처리한 후 a2 값을 처리합니다. 
+반면 그룹 함수는 여러 건의 데이터를 동시에 처리하여 해당 그룹에 해당하는 결과를 반환합니다. 
+즉, d1, d2, d3, d4를 동시에 입력받아 함수를 거쳐 결괏값을 출력합니다. 
+그룹 함수는 주로 나중에 배울 GROUP BY 절과 함께 쓰이며 요약된 정보를 출력해야 할 때 유용합니다.
+
+
+
+LOWER 전부 소문자
+UPPER 전부 대문자
+INITCAP 첫글자만 대문자
+
+SELECT last_name,
+       LOWER(last_name) LOWER적용,
+       UPPER(last_name) UPPER적용,
+       email,
+       INITCAP(email) INITCAP적용
+FROM hr.employees;
+
+   필요한 글자만 잘라내기(대상열, 부터, 몇개)
+SELECT job_id, SUBSTR(job_id, 1, 2) 적용결과
+FROM hr.employees;
+
+   원하는 글자로 찾아서 바꾸기(대상열, 찾을값, 바꿀값)
+SELECT job_id, REPLACE(job_id, 'ACCOUNT', 'ACCNT') 적용결과
+FROM hr.employee;
+
+   LPAD 왼쪽을 채우는데 자릿수를 만들어 빈공간을 채운다.(대상열, 자리수, 빈공간을 채울 문자)
+SELECT first_name, LPAD(first_name, 12, '*') LPAD적용결과
+FROM hr.employees;
+
+   RPAD 오른쪽을 채우는데 자릿수를 만들어 빈공간을 채운다.
+SELECT first_name, RPAD(first_name, 12, '*') RPAD적용결과
+FROM hr.employees;
+
+   LTRIM/RTRIM 왼쪽/오른쪽 부터 찾아서 만나는 값을 삭제
+   주로 여백 삭제용으로 사용된다. 
+SELECT job_id,
+       LTRIM(job_id, 'F') LTRIM적용결과,
+       RTRIM(job_id, 'T') RTRIM적용결과
+FROM hr.employees;
+
+
+ROUND 반올림 (대상열,반올림자리)
+1 소수점아래 한자리로
+-1 소수점위 한자리부터
+
+SELECT salary,
+       salary/30 일급,
+       ROUND(salary/30, 0) 적용결과0,
+       ROUND(salary/30, 1) 적용결과1,
+       ROUND(salary/30, -1) 적용결과MINUS1
+FROM   hr.employees;
+
+
+
+TRUNC 버림
+1 소수점아래 한자리로
+-1 소수점위 한자리부터
+
+SELECT salary,
+       salary/30 일급,
+       TRUNC(salary/30, 0) 적용결과0,
+       TRUNC(salary/30, 1) 적용결과1,
+       TRUNC(salary/30, -1) 적용결과MINUS1
+FROM   hr.employees;
+
+
+
+----------------------------------------
+
+
+변환 함수
+데이터 타입 변환은 오라클에 의해 자동으로(암묵적으로) 혹은 수동으로(명시적으로) 실핼할수 있다. 
+
+자동 타입 변환
+
+varchar2로 되어 있는 데이터값 100 은 number타입으로 자동변환되어 산술 계산될수 있다. 
+반대로 number타입 100은 varchar2타입으로 자동변환되어 저장될수 있다. 
+
+
+작은 따옴표로 묶였기 때문에 문자 데이터 타입, 오라클에 의해 자동으로 형변환이 이루어져 계산되었다. 
+SELECT 1 + '2'
+FROM DUAL;
+
+
+하지만... 자동 형변환을 이용할수 있더라도 SQL 의 안정성을 위해 수동 데이터 타입 변환을 수행할것을 권장한다. 
+
+
+사용자가 타입을 변환할수 있도록 변환함수를 제공한다. 
+
+TO_CHAR   숫자 문자 날짜 값을 VARCHAR2 타입으로 변환한다. 
+TO_NUMBER 문자를 숫자로 변환한다. 
+TO_DATE 날짜처럼 보이는 문자열을 진짜 날짜 타입으로 변환한다. 
+
+### 문자로 형변환
+
+현재 시스템의 진짜 날짜에서 년만 추출하여 표기
+
+SELECT TO_CHAR(SYSDATE,'YY')
+FROM DUAL;
+
+SELECT TO_CHAR(SYSDATE,'YYYY')
+FROM DUAL;
+
+
+
+현재 시스템의 진짜 날짜에서 월만 추출하여 표기  04
+
+SELECT TO_CHAR(SYSDATE,'MM')
+FROM DUAL;
+
+
+현재 시스템의 진짜 날짜에서 월만 추출하여 표기   APR
+
+SELECT TO_CHAR(SYSDATE,'MON')
+FROM DUAL;
+
+
+년월일 모두    20220411
+SELECT TO_CHAR(SYSDATE,'YYYYMMDD')
+FROM DUAL;
+
+
+특정 년월일을 나타내기
+
+SELECT TO_CHAR(TO_DATE('20110411','YYYY-MM-DD'),'YYYY-MM-DD')
+FROM DUAL;
+
+
+
+
+시간 표현   12:37:38 AM
+
+SELECT TO_CHAR(SYSDATE, 'HH:MI:SS PM')
+FROM DUAL;
+
+날짜 시간 함꼐 표현
+
+SELECT TO_CHAR(SYSDATE, 'YYYY/MM/DD HH:MI:SS PM')
+FROM DUAL;
+
+
+
+### 숫자로 형변환
+
+123이라는 문자를 진짜 숫자로 변환
+
+SELECT TO_NUMBER('123')
+FROM DUAL;
+
+
+
+NVL 함수 : 널값 대체 함수
+not null  : null 값을 가지지 못하도록 지정
+
+
+null의 특징
+값이 할당되지 않아 사용이 불가능한 값
+0과 공백과는 다른 값
+null을 포함하는 계산의 결과값은 null
+
+
+
+SELECT *
+FROM hr.employees
+ORDER BY commission_pct;
+
+
+null값들이 순서대로 아래에 배치된다. 
+
+
+
+null을 포함한 계산 결과는 null이 된다. 
+SELECT salary * commission_pct
+FROM hr.employees
+ORDER BY commission_pct;
+
+
+
+
+commission_pct 값이 null인 경우에는 1로 치환하여 계산한다. 
+
+
+SELECT salary * NVL(commission_pct, 1)
+FROM hr.employees
+ORDER BY commission_pct;
+
+
+null은 산술 이나 배율 등을 계산할때 논리적으로 오류를 일으킬 경우 가 발생한다. 
+이런경우 NVL함수를 사용하여 null값을 의도에 맞게 처리하수 있다.  
+
+
+
+
+DECODE 함수  : if와 유사 조건 처리
+
+(열, 조건, true 경우, false 경우)
+
+SELECT first_name,
+        last_name,
+        salary 원래급여,
+        DECODE(department_id, 60, salary*1.1, salary) 조정된급여,
+        DECODE(department_id, 60, '10%보너스', '노보너스') 보너스지급여부
+FROM hr.employees;
+
+
+
+
+CASE 복잡한 조건을 여러개 처리
+DECODE 함수는 데이터 값이 정확히 맞거나 틀린 경우 처리하기가 쉽고
+CASE 함수는 조건의 범위가 다양하고 복잡한 경우 쉽게 처리할수 있다. 
+
+
+
+salary 값의 조건에 따라 3가지 로 구분한 값을 새로운 열 급여등급 을 만들어 표시한다. 
+
+SELECT first_name, last_name, salary,
+    CASE
+        WHEN salary >= 9000 THEN '상위급여'
+        WHEN salary BETWEEN 600 AND 8999 THEN '중위급여'
+        ELSE '하위급여'
+    END AS 급여등급
+FROM hr.employees;
+
+데이터 값의 범위를 정확하게 모르는 상태에서 특정 조거에 맞춰 출력한다면 CASE 문이 유용하다. 
+
+실무에서도 CASE문은 매우 다양하게 활용할수 있다 예를 들면 점수에 대한 등급, 나이에 대한 
+나이대 설정, 지역 구분등 얼마든지 응용할수 있는 범위가 많다. 
+
+
+RANK, DENSE_RANK, ROW_NUMBER  순위 매기기
+
+
+RANK - 공통 순위만큼 건너뛰어 다음 순위를 출력한다.          1, 2, 2, 4
+DENSE_RANK - 공통순위를 출력하고 건너뛰지 않고 다음 순위 출력 1, 2, 2, 3
+ROW_NUMBER - 공통 순위 없이 출력                        1, 2, 3, 4
+
+
+
+그룹 요약 함수
+단일행함수와는 달리 여러행에 대해 함수가 적용되어 하나의 결과를 나타내는 함수이다. 
+집계함수라고 부르기도한다. 
+
+대부분의 그룹함수는 null이 있으면 그 값은 제외하고 연산한다. 하지만
+count함수는 count(*) 의 경우 null값도 행으로 셀수 있다. 
+
+group by 
+having
+
+
+
+salary 열 전체의 갯수   count(*) 107
+                    COUNT(COMMISSION_PCT)   35
+SELECT COUNT(salary)
+FROM hr.employees;
+
+
+
+SELECT SUM(salary) 합계, AVG(salary) 평균, SUM(salary)/COUNT(salary) 계산한평균
+FROM hr.employees;
+
+
+합계	평균	계산한평균
+691416	6461.831775700934579439252336448598130841	6461.831775700934579439252336448598130841
+
+
+
+MAX,MIN
+
+SELECT MAX(salary) 최대값, MIN(salary)최소값, MAX(first_name) 최대문자값, MIN(first_name) 최소문자값
+FROM hr.employees;
+
+최대값	최소값	최대문자값	최소문자값
+24000	2100	Winston	Adam
+
+
+
+GROUP BY 그룹으로 묶기
+
+
+
+SELECT 열이름, 열이름(그룹)
+FROM 테이블이름
+WHERE 조건식(생략가능)
+GROUP BY 열이름 
+ORDER BY 열이름 (정렬 생략가능)
+
+
+테이블에 접근하여
+WHERE 조건에 맞는 데이터만 골라내고 (생략가능)
+열을 같은 값끼리 그룹화하여
+오름차순 / 내림차순 정렬하여
+결과를 출력
+
+
+
+employee 테이블에서 employee_id 가 10이상 직원들만 job_id 별로 그룹화하여
+job_id 별로 총 급여와 job_id 별 평균급여를 구하고
+job_id 별 총 급여를 기준으로 내림차순 정렬하세요
+
+
+SELECT job_id 직무, SUM(salary) 총급여, AVG(salary) 평균급여
+FROM hr.employees
+WHERE employee_id >= 10
+GROUP BY job_id
+ORDER BY 총급여 DESC
+
+
+SELECT job_id 직무_대분류, manager_id 매니저_소분류, SUM(salary) 총급여, AVG(salary) 평균급여
+FROM hr.employees
+WHERE employee_id >= 10
+GROUP BY job_id, manager_id
+ORDER BY 총급여 DESC
+
+
+
+
+
+HAVING 연산된 그룹 함수 결과에 조건을 적용하기
+
+where절에서는 그룹함수를 사용할수 없기때문에 having 절을 사용하여 
+그룹함수의 결과에 다시 조건을 적용한다. 
+
+
+
+employees 테이블에서 employee_id 가 10 이상인 직원들에 대해 job_id 별로
+그룹화하여 job_id별로 총 급여와 평균 급여를 구하고  job_id 별 총급여가
+30000 보다 큰값만 job_id별 총급여를 기준으로 내림차순 정렬하여 출력하세요. 
+
+
+SELECT job_id 직무, SUM(salary) 총급여, AVG(salary) 평균급여
+FROM hr.employees
+WHERE employee_id >= 10
+GROUP BY job_id
+HAVING SUM(salary) > 30000
+ORDER BY 총급여 DESC
+
+
+
+여러개 테이블 연결 join  
+
+관계형 데이터베이스의 핵심 요소 조인
+
+조인???
+관계형 데이터 베이스란 테이블들이 관계를 맺고 조작되는 원리를 가진다. 
+테이블에는 각 유형에 맞는 데이터가 저장되고 테이블은 특정한 규칙에 따라 상호 관계를 가진다. 
+이를 위해 사용하는 기법이 조인이다. 
+조은인 한개 이상의 테이블과 테이블을 서로 연결하여 사용하는 기법을 말한다. 
+
+
+
+조인 기법
+
+동등조인 조인 조건이 정확히 일치하는 경우에만 결과 출력
+외부조인 조인 조건이 정확히 일치하지 않아도 모든 결과 출력
+자체조인 자체 테이블에서 조인하고자 할때 사용
+
+(곱집합, 비동등)
+
+
+동등 조인의 기본 구문
+
+SELECT  테이블1.열1   [, 테이블2.열2]
+FROM 테이블1, 테이블2
+WHERE 테이블1.열1 = 테이블2.열2]
+
+SELECT 절에는 출력할 열
+FROM 접근하려는 테이블 들의 이름
+WHERE 절에는 조인 조건을 기술
+
+조회의 명확성을 위해서 열이름 앞에는 테이블 이름을 붙인다. (테이블들에 동일한 이름이 존재할수 있기때문에 )

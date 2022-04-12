@@ -181,3 +181,304 @@ SELECT salary,
        TRUNC(salary/30, 1) 적용결과1,
        TRUNC(salary/30, -1) 적용결과MINUS1
 FROM   hr.employees;
+
+변환 함수
+데이터 타입 변환은 오라클레 의해 자동으로(암묵적으로) 혹은 수동으로(명시적으로) 실행할 수 있음
+
+자동 타입 변환
+varcahr2로 되어있는 데이터값 100은 number타입으로 자동변환되어 산술 계산할 수 있음
+반대로 numver 타입 100은 varchar2타입으로 자동변환되어 저장할 수 있음
+
+문자와 숫자의 산술
+SELECT 1 + '2'
+FROM DUAL;
+
+타입 변환 함수
+TO_CHAR 숫자 문자 날짜 값을 varchar2 타입으로 변환
+TO_NUMBER 문자를 숫자로 변환
+TO_DATE 날짜처럼 보이는 문자열을 진짜 날짜 타입으로 변환
+
+현재 시스템의 진짜 날짜에서 년만 추출하여 표기
+SELECT TO_CHAR(SYSDATE, 'YY')
+FROM DUAL;
+
+SELECT TO_CHAR(SYSDATE, 'YYY')
+FROM DUAL;
+
+현재 시스템의 진짜 날짜에서 월만 추출하여 표기
+SELECT TO_CHAR(SYSDATE, 'MM')
+FROM DUAL;
+
+SELECT TO_CHAR(SYSDATE, 'MON')
+FROM DUAL;
+
+SELECT TO_CHAR(SYSDATE, 'YYYYMMDD')
+FROM DUAL;
+
+
+특정 년월일을 나타내기
+SELECT TO_CHAR(TO_DATE('20110411', 'YYYYMMDD'),'YYYYMMDD)
+FROM DUAL;
+
+시간표현
+SELECT TO_CHAR(SYSDATE, 'HH:MM:SS PM')
+FROM DUAL;
+
+날짜와 시간을 표현
+SELECT TO_CHAR(SYSDATE, 'YYYY/MM/DD HH:MI:SS PM')
+FROM DUAL;
+
+숫자로 형변환
+SELECT TO_NUMBER('123')
+FROM DUAL;
+
+함수 
+not NULL: null 값을 가지지 못하도록 지정
+null의 특징
+값이 할당되지 않아 사용이 불가능한 값
+0과 공백과는 다른 값
+null을 포함하는 계산의 결과값은 null
+
+null을 포함한 계산 결과는 null이 됨
+SELECT*
+FROM hr.employees
+ORDER BY commission_pct;
+
+
+commission_pct 값이 null인 경우에는 1로 치환
+SELECT salary * NVL(commission_pct,1)
+FROM hr.employees
+ORDER BY commission_pct;
+
+null은 산술계산 이나 배율 등을 계산할때 논리적으로 오류를 일으킬 경우가 발생됨
+이런경우 NVL함수를 사용하여 null 값을 의도에 맞게 처리
+
+DECODE 함수: if와 유사 조건 처리
+SELECT first_name,
+        last_name,
+        salary 원래급여,
+        DECODE(department_id, 60, salary*1.1, salary) 조정된급여,
+        DECODE(department_id, 60, '10%보너스', '노보너스') 보너스지급여부
+FROM hr.employees;        
+
+
+CASE 복잡한 조건을 여러개 처리
+DECODE 함수는 데이터 값이 정확히 맞거나 틀린 경우 처리하기가 쉽고
+CASE 함수는 조건의 범위가 다양하고 복잡한 경우 쉽게 처리할 수 있음
+
+
+SELECT first_name, last_name, salary,
+    CASE
+        WHEN salary >= 9000 THEN '상위급여'
+        WHEN salary BETWEEN 600 AND 8999 THEN '중위급여'
+        ELSE '하위급여'
+        END AS 급여등급
+FROM hr.employees;
+
+데이터 값의 범위를 정확하게 모르는 상태에서 특정 조건에 맞춰 출력한다면 CASE문이 유용
+
+RANK, DENSE_RANK, ROW_NUMBER 순위 매기기
+RANK - 공통 순위만큼 건너뛰어 다음 순위를 출력
+DENSE_RANK 공통순위를 출력하고 건너뛰지 않고 다음 순위 출력
+ROW_NUMBER 공통 순위 없이 출력
+
+그룹 요약 함수
+단일행 함수와는 달리 여러행에 대해 함수가 적용되어 하나의 결과를 나타내는 함수
+집계함수라고 부르기도 함
+
+대부분의 그룹함수는 null이 있으면 그 값은 제외하고 연산
+하지만 count 함수는 null값도 행으로 셀수 있음
+
+group by 
+having
+
+SELECT COUNT(salary)
+FROM hr.employees;
+
+SELECT 열이름, 열이름(그룹)
+FROM 테이블이름
+WHRER 조건식(생략가능)
+GROUP BY 열이름
+ORDER BY 열이름(정렬 생략가능)
+
+테이블에 접근하여
+WHERE 조건에 맞는 데이터만 골라내고(생략가능)
+열을 같은 값끼리 그룹화하여
+오름차순 / 내림차순 정렬하여
+결과를 출력
+
+여러개 테이블 연결 join
+관계형 데이터베이스의 핵심 요소 조인
+관계형 테이터 베이스란 관계를 맺고 조작되는 원리를 가짐
+테이블에는 각 유형에 맞는 데이터가 저장되고 테이블은 특정한 규칙에 따라 상호 관계를 가짐
+
+조인 기법
+
+동등조인 조인 조건이 정확히 일치하는 경우에만 결과 출력
+외부조인 조인 조건이 정확히 일치하지 않아도 모든 결과 출력
+자체조인 자체 테이블에서 조인하고자 할때 사용
+
+(곱집합 , 비동등)
+
+SELECT 테이블1.열1, 테이블2.열2 [, 테이블2.열2]
+FROM 테이블1, 테이블2
+WHERE 테이블1.열1 = 테이블2.열2
+
+SELECT 절에는 출력할 열
+FROM 접근하려는 테이블 들의 이름
+WHERE 절에는 조인 조건을 기술
+
+조회의 명확성을 위해서 열이름 앞에는 테이블 이름을 붙임
+(테이블들에 동일한 이름이 존재할 수 있기 때문에)
+
+
+SELECT *
+FROM hr.employees A, hr.departments B
+WHERE A.department_id = B.department_id;
+
+부서에 대한 상세 정보를 보기 위해서 employee 테이블과 departments 테이블의
+각각 키인 department_id를 조인한 결과
+department_id 값이 같은것 끼리 연결되어 조인된것을 볼수 있음
+열 전체를 보기 위해 * 사용
+
+어떤 직원이 어느 부서에 속하는지 알 수 있게 되었음
+
+
+SELECT *
+FROM hr.employees A, hr.departments B, hr.locations C
+WHERE A.department_id = B.department_id
+AND B.location_id = C.location_id;
+
+
+SELECT A.employee_id, A.department_id, B.department_name, C.location_id, C.city
+FROM hr.employees A, hr.departments B, hr.locations C
+WHERE A.department_id = B.department_id
+AND B.location_id = C.location_id;
+
+
+* 외부조인: 모든 데이터를 연결
+동등조인은 데이터값이 정확히 일치하는 경우에만 결과를 출력
+데이터값이 일치하지 않으면 조회가 되지 않음
+
+
+SELECT COUNT(*)
+FROM hr.employees A, hr.departments B
+WHERE A.department_id = B.department_id;
+= 106
+
+
+SELECT COUNT(*)
+FROM hr.employees A;
+= 107
+
+-> 일치하지 않는것이 있어 1개가 누락됨
+
+외부조인: 조건을 만족하지 않는 행도 모두 출력
+1. 동등 조건을 만족하지 못해서 누락되는 행을 출력하기 위해 사용
+2. 외부 조인은 + 기호를 사용
+3. + 기호는 조인할 행이 없는(데이터가 부족한) 테이블 열 이름 뒤에 기술
+4. + 기호는 외부 조인 하려는 한쪽에만 기술할 수 있음 양쪽에는 기술할 수 없음
+5. + 기호를 붙이면 데이터 값이 부족한 테이블에 null 값을 갖는 행이 생성되어
+데이터 값이 충분한 테이블의 행들이 null행에 조인됨 
+
+SELECT *
+FROM hr.employees A, hr.departments B
+WHERE A.department_id = B.department_id(+)
+ORDER BY A.employee_id;
+
+employees 테이블과 departments 테이블을 department_id로 외부조인하여
+department_id가 null인 값도 함께 출력
+
+외부조인은 별로 일치하지 않는 데이터를 출력할때 유용
+
+SELECT *
+FROM hr.employees A, hr.departments B
+WHERE A.department_id(+) = B.department_id
+ORDER BY A.employee_id;
+
+
+* 자체조인: 자기 자신의 데이터와 연결
+employees 테이블의 manager_id = 담당 매니저의 employee_id
+
+SELECT A.employee_id, A.first_name, A.last_name, A.manager_id, 
+B.first_name || ' '||B.last_name manager_name
+FROM hr.employees A, hr.employees B
+WHERE A.manager_id = B.employee_id;
+
+각기 다른 별명을 사용하여 마치 서로 다른 두개의 테이블을 조인하는것처럼 사용
+자체 조인을 할때 테이블은 동일한 열로 구성되기 때문에 조회할 때 반드시 별명.열이름의 형태로
+명확하게 구별하여 조회할것
+
+서브쿼리:
+select 안에 select
+서브 쿼리는 select문을 효율적으로 작성할 수 있게 도와줌
+복잡한 select 문을 작성할때는 거의 필수로 사용되는 기법
+
+1. 서브쿼리는 괄호로 묶어서 만듬. 메인은 괄호가 없음
+2. 메인 쿼리와 서브 쿼리를 연결하기 위해서는 단일 행 연산자나 다중 행 연산자를 사용
+3. 메인 쿼리와 서브 쿼리 연결은 연산자에 따라 의미가 다름 
+4. 메인 쿼리는 연산자 왼쪽에 서브 쿼리는 연산자 오른쪽에 기술
+5. 실행 순서: 서브쿼리 -> 메이쿼리
+6. 서브 쿼리의 서브 쿼리 형태로도 계속 중첩하여 sql문을 작성할 수 있음
+
+
+단일행 서브쿼리 - 하나의 행을 검색하는 서브쿼리
+다중행 서브쿼리 - 하나 이상의 행을 검색하는 서브쿼리 
+다중열 서브쿼리 - 하나 이상의 열을 검색하는 서브쿼리
+
+1. 단일행 서브쿼리
+서브쿼리로 얻은 한개의 행 결과값을 메인 쿼리로 전달하는 서브쿼리.
+조건식의 where 절에 기술되는 열의 개수와 데이터타입은 메인쿼리와 서브쿼리가 서로 같아야함
+
+SELECT *
+FROM hr.employees A
+WHERE A.salary = ( 
+    SELECT salary
+    FROM hr.employees
+    WHERE last_name = 'De Haan');
+    
+
+서브 쿼리의 결과값 17000을 메인 쿼리의 조건값으로 전달
+메인 쿼리는 그 값을 받아 salary가 17000인 모든 직원을 출력
+
+2. 다중행 서브쿼리
+다중행 서브쿼리는 하나 이상의 결과 행을 메인 쿼리에 전달하는 경우 사용하고 다중행 연산자를 사용
+
+IN, NOT IN, EXISTS, ANY, ALL
+SELECT *
+FROM hr.employees A
+WHERE A.salary in 
+(   SELECT MIN(salary)
+    FROM hr.employees 
+    GROUP BY department_id
+);
+    
+
+3. 다중열 서브쿼리
+다중열 서브쿼리는 메인쿼리와 서브쿼리를 비교하는 where 조건식에서 비교되는 열이 여러개일때 사용하는 서브쿼리    
+
+SELECT *
+FROM hr.employees A
+WHERE (A.job_id, A.salary) in 
+(   SELECT job_id, MIN(salary)
+    FROM hr.employees 
+    GROUP BY job_id
+);
+
+다중 열 서브쿼리를 사용하려면 조건식의 메인쿼리와 서브쿼리의 각열이 일대일로 대응해야 하며
+데이터 타입도 동일해야 함
+
+FROM절의 서브쿼리
+FROM 절에 서브쿼리를 사용하면 특정 조건식을 갖는 select 문을 테이블처럼 사용할 수 있음
+마치 가상 테이블과 같은 역활을 하고 view와 비슷한 역활이라서 inline view라고 부름
+select 구문을 더욱 정교하게 작성할 수 있게 됨
+
+
+DML 데이터 조작어 data manipulation language
+데이터 삽입 / 갱신 / 삭제
+
+DDL 데이터 정의어 data definition language
+데이터베이스 생성 / 테이블 생성
+
+
+
